@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Spreadsheet Table</title>
+  <link href="https://unpkg.com/tabulator-tables@5.6.2/dist/css/tabulator.min.css" rel="stylesheet">
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    #table { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Spreadsheet Data</h1>
+  <div id="table"></div>
+
+<link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
+  <script>
+    let offline = true
+
+    let mockData = [
+        {"title":"solve agi", "tags":"infrastructure, build", "status":"in-progress", "implementation":"codeallthethingz,vkakerbeck", "size":"small"},
+        {"title":"robotic ant army", "tags":"destroy humanity, ", "status":"", "implementation":"", "size":"large"},
+        {"title":"break all captchas", "tags":"some,really,long,tag,list,so,that,we,can,see", "status":"", "implementation":"", "size":"unknown"}
+    ]
+
+    if (offline) {
+        new Tabulator("#table", {
+            data: mockData,
+            autoColumns:true,
+            });
+    }
+    else {    
+        fetch('/api/data')
+        .then(res => res.json())
+        .then(data => {
+        
+
+            new Tabulator("#table", {
+            data: data,
+            autoColumns:true,
+            });
+        })
+        .catch(err => console.error(err));
+    }
+
+  </script>
+</body>
+</html>
