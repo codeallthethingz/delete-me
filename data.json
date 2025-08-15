@@ -6,7 +6,8 @@
     "status": "in-progress",
     "implementation": "codeallthethingz,vkakerbeck",
     "size": "small",
-    "group": "Sensor Module"
+    "group": "Sensor Module",
+    "skills": "python, cpu, gpu"
   },
   {
     "title": "robotic ant army",
@@ -14,7 +15,8 @@
     "status": "",
     "implementation": "",
     "size": "large",
-    "group": "Sensor Module"
+    "group": "Sensor Module",
+    "skills": "ants, robotics, lack of empathy"
   },
   {
     "title": "break all captchas",
@@ -22,6 +24,7 @@
     "status": "",
     "implementation": "",
     "size": "unknown",
-    "group": "Learning Module"
+    "group": "Learning Module",
+    "skills": "captcha, python, numpy"
   }
 ]

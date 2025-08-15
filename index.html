@@ -13,15 +13,21 @@
       margin: 20px;
     }
 
-    /* .tabulator {
-      display: inline-block;
-    } */
-
     .badge {
       background-color: #aaaaff;
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 12px;
+      display: inline-block;
+    }
+
+    .badge-skills {
+      background-color: #7984fd;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: inline-block;
     }
 
     .badge-size-small {
@@ -43,10 +49,35 @@
       background-color: #cccccc;
       color: #222;
     }
+
+    #searchInput {
+      width: 100%;
+      padding: 3px 6px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-family: sans-serif;
+      transition: border-color 0.2s ease;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border-color: #4ec04e;
+      box-shadow: 0 0 0 3px rgba(78, 192, 78, 0.1);
+    }
+
+    #searchInput::placeholder {
+      color: #999;
+    }
+
   </style>
 </head>
 
 <body>
+  <div style="margin-bottom: 20px;">
+    <input type="text" id="searchInput" placeholder="Search across all fields...">
+  </div>
   <div id="table"></div>
 
   <script type="text/javascript" src="tabulator.min.js"></script>
@@ -64,6 +95,13 @@
                             `<span class="badge">${tag}</span>`
                           ).join(" ");
                         }
+
+                                function formatSkillsColumn(cell, formatterParams, onRendered) {
+                                  const skills = (cell.getValue() || "").split(",").map(s => s.trim()).filter(Boolean);
+                                  return skills.map(skill =>
+                                    `<span class="badge-skills">${skill}</span>`
+                                  ).join(" ");
+                                }
 
                         function formatSizeColumn(cell, formatterParams, onRendered) {
                           const value = (cell.getValue() || "").trim().toLowerCase();
@@ -87,32 +125,81 @@
     if (offline) {
       url = 'data.json';
     }
-
+      url = 'https://raw.githubusercontent.com/codeallthethingz/delete-me/refs/heads/main/data.json';
   fetch(url)
     .then(res => res.json())
     .then(data => {
-      new Tabulator("#table", {
+      const table = new Tabulator("#table", {
         data: data,
-        autoColumns: true,
         layout: 'fitDataStretch',
-        autoColumnsDefinitions: {
-          implementation: {
-            formatter: formatImplementationColumn,
-          },
-          tags: {
-            formatter: formatTagsColumn,
-          },
-          size: {
-            formatter: formatSizeColumn,
-          },
-          link: {
+        columns: [
+          {
+            title: "",
+            field: "link",
             formatter: formatLinkColumn,
+            hozAlign: "center"
           },
-          group: {
-            visible: false,
+          {
+            title: "Title",
+            field: "title"
+          },
+          {
+            title: "Size",
+            field: "size",
+            formatter: formatSizeColumn,
+            hozAlign: "center"
+          },
+          {
+            title: "Status",
+            field: "status"
+          },
+          {
+            title: "Implementation",
+            field: "implementation",
+            formatter: formatImplementationColumn,
+            hozAlign: "center"
+          },
+          {
+            title: "Tags",
+            field: "tags",
+            formatter: formatTagsColumn,
+            widthGrow: 2
+          },
+          {
+            title: "Skills",
+            field: "skills",
+            formatter: formatSkillsColumn,
+            widthGrow: 2
           }
-        },
+        ],
         groupBy: "group"
+      });
+
+      // Add global search functionality
+      const searchInput = document.getElementById("searchInput");
+      searchInput.addEventListener("input", function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+        if (searchTerm.trim() === "") {
+          table.clearFilter();
+        } else {
+          // Custom filter function to search across all fields
+          table.setFilter(function (data) {
+            const fieldsToSearch = [
+              data.title || "",
+              data.tags || "",
+              data.skills || "",
+              data.status || "",
+              data.implementation || "",
+              data.size || "",
+              data.link || "",
+              data.group || ""
+            ];
+
+            // Join all field values and search within them
+            const allText = fieldsToSearch.join(" ").toLowerCase();
+            return allText.includes(searchTerm);
+          });
+        }
       });
     })
     .catch(err => console.error(err));
