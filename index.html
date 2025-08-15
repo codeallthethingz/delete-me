@@ -1,49 +1,122 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8" />
   <title>Spreadsheet Table</title>
-  <link href="https://unpkg.com/tabulator-tables@5.6.2/dist/css/tabulator.min.css" rel="stylesheet">
+  <link href="tabulator.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
+
   <style>
-    body { font-family: sans-serif; margin: 20px; }
-    #table { margin-top: 20px; }
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+
+    /* .tabulator {
+      display: inline-block;
+    } */
+
+    .badge {
+      background-color: #aaaaff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .badge-size-small {
+      background-color: #b6fcb6;
+      color: #222;
+    }
+
+    .badge-size-medium {
+      background-color: #4ec04e;
+      color: #fff;
+    }
+
+    .badge-size-large {
+      background-color: #006400;
+      color: #fff;
+    }
+
+    .badge-size-unknown {
+      background-color: #cccccc;
+      color: #222;
+    }
   </style>
 </head>
+
 <body>
-  <h1>Spreadsheet Data</h1>
   <div id="table"></div>
 
-<link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css" rel="stylesheet">
-<script type="text/javascript" src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
+  <script type="text/javascript" src="tabulator.min.js"></script>
   <script>
-    let offline = true
+                        function formatImplementationColumn(cell, formatterParams, onRendered) {
+                          const usernames = (cell.getValue() || "").split(",").map(u => u.trim()).filter(Boolean);
+                          return usernames.map(username =>
+                            `<img src="https://github.com/${encodeURIComponent(username)}.png" width="24" height="24" style="vertical-align:middle;border-radius:2px;" alt="${username}"/>`
+                          ).join(" ");
+                        }
 
-    let mockData = [
-        {"title":"solve agi", "tags":"infrastructure, build", "status":"in-progress", "implementation":"codeallthethingz,vkakerbeck", "size":"small"},
-        {"title":"robotic ant army", "tags":"destroy humanity, ", "status":"", "implementation":"", "size":"large"},
-        {"title":"break all captchas", "tags":"some,really,long,tag,list,so,that,we,can,see", "status":"", "implementation":"", "size":"unknown"}
-    ]
+                        function formatTagsColumn(cell, formatterParams, onRendered) {
+                          const tags = (cell.getValue() || "").split(",").map(t => t.trim()).filter(Boolean);
+                          return tags.map(tag =>
+                            `<span class="badge">${tag}</span>`
+                          ).join(" ");
+                        }
+
+                        function formatSizeColumn(cell, formatterParams, onRendered) {
+                          const value = (cell.getValue() || "").trim().toLowerCase();
+                          const label = value || "unknown";
+                          const badgeClass = `badge-size-${label}`;
+                          return `<span class="badge ${badgeClass}">${label}</span>`;
+                        }
+
+                        function formatLinkColumn(cell, formatterParams, onRendered) {
+                          const value = cell.getValue();
+                          if (!value) return "";
+                          const fullUrl = `https://thousandbrainsproject.readme.io/docs/${value}`;
+                          return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" title="${fullUrl}">
+        <i class="fas fa-external-link-alt"></i>
+      </a>`;
+                        }
+
+                        let offline = true;
+                        let url = '/api/data';
 
     if (offline) {
-        new Tabulator("#table", {
-            data: mockData,
-            autoColumns:true,
-            });
-    }
-    else {    
-        fetch('/api/data')
-        .then(res => res.json())
-        .then(data => {
-        
-
-            new Tabulator("#table", {
-            data: data,
-            autoColumns:true,
-            });
-        })
-        .catch(err => console.error(err));
+      url = 'data.json';
     }
 
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      new Tabulator("#table", {
+        data: data,
+        autoColumns: true,
+        layout: 'fitDataStretch',
+        autoColumnsDefinitions: {
+          implementation: {
+            formatter: formatImplementationColumn,
+          },
+          tags: {
+            formatter: formatTagsColumn,
+          },
+          size: {
+            formatter: formatSizeColumn,
+          },
+          link: {
+            formatter: formatLinkColumn,
+          },
+          group: {
+            visible: false,
+          }
+        },
+        groupBy: "group"
+      });
+    })
+    .catch(err => console.error(err));
   </script>
 </body>
+
 </html>
