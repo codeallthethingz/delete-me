@@ -8,35 +8,91 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
 
   <style>
-    body { font-family: sans-serif; margin: 20px; }
-    .search-container { margin-bottom: 20px; }
-    .badge, .badge-skills { 
-      padding: 4px 8px; border-radius: 4px; font-size: 12px; 
-      display: inline-block; cursor: pointer; transition: background-color 0.2s ease; 
+    body {
+      font-family: sans-serif;
+      margin: 20px;
     }
-    .badge { background-color: #aaaaff; }
-    .badge:hover { background-color: #9999ee; }
-    .badge-skills { background-color: #7984fd; color: #fff; }
-    .badge-skills:hover { background-color: #6873ec; }
-    .badge-size-small { background-color: #b6fcb6; color: #222; }
-    .badge-size-small:hover { background-color: #a5eba5; }
-    .badge-size-medium { background-color: #4ec04e; color: #fff; }
-    .badge-size-medium:hover { background-color: #3da93d; }
-    .badge-size-large { background-color: #006400; color: #fff; }
-    .badge-size-large:hover { background-color: #004d00; }
+
+    .search-container {
+      margin-bottom: 20px;
+    }
+
+    .badge,
+    .badge-skills {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: inline-block;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .badge {
+      background-color: #aaaaff;
+    }
+
+    .badge:hover {
+      background-color: #9999ee;
+    }
+
+    .badge-skills {
+      background-color: #7984fd;
+      color: #fff;
+    }
+
+    .badge-skills:hover {
+      background-color: #6873ec;
+    }
+
+    .badge-size-small {
+      background-color: #b6fcb6;
+      color: #222;
+    }
+
+    .badge-size-small:hover {
+      background-color: #a5eba5;
+    }
+
+    .badge-size-medium {
+      background-color: #4ec04e;
+      color: #fff;
+    }
+
+    .badge-size-medium:hover {
+      background-color: #3da93d;
+    }
+
+    .badge-size-large {
+      background-color: #006400;
+      color: #fff;
+    }
+
+    .badge-size-large:hover {
+      background-color: #004d00;
+    }
 
     #searchInput {
-      width: 100%; padding: 3px 6px; font-size: 16px; border: 2px solid #ddd;
-      border-radius: 8px; box-sizing: border-box; font-family: sans-serif;
+      width: 100%;
+      padding: 3px 6px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-family: sans-serif;
       transition: border-color 0.2s ease;
     }
-    #searchInput:focus { 
-      outline: none; border-color: #4ec04e; 
-      box-shadow: 0 0 0 3px rgba(78, 192, 78, 0.1); 
+
+    #searchInput:focus {
+      outline: none;
+      border-color: #4ec04e;
+      box-shadow: 0 0 0 3px rgba(78, 192, 78, 0.1);
     }
-    #searchInput::placeholder { color: #999; }
+
+    #searchInput::placeholder {
+      color: #999;
+    }
   </style>
-</head>
+  </head>
 
 <body>
   <div class="search-container">
@@ -46,206 +102,84 @@
 
   <script type="text/javascript" src="tabulator.min.js"></script>
   <script>
-                                  // Function to toggle clicked badge value in search box
-                                  function addToSearch(value) {
-                                    const searchInput = document.getElementById("searchInput");
-                                    const currentValue = searchInput.value.trim();
+    function addToSearch(value) {
+      const input = document.getElementById("searchInput");
+      const words = input.value.trim().split(/\s+/).filter(Boolean);
+      const index = words.indexOf(value);
+      if (index !== -1) words.splice(index, 1);
+      else words.push(value);
+      input.value = words.join(" ");
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
 
-                                  // Split current search into words
-                                  const searchWords = currentValue === "" ? [] : currentValue.split(/\s+/);
-
-                                  // Check if the value is already in the search
-                                  const existingIndex = searchWords.indexOf(value);
-
-                                  if (existingIndex !== -1) {
-                                    // Remove the value if it already exists
-                                    searchWords.splice(existingIndex, 1);
-                                    searchInput.value = searchWords.join(" ");
-                                  } else {
-                                    // Add the value if it doesn't exist
-                                    if (currentValue === "") {
-                                      searchInput.value = value;
-                                    } else {
-                                      searchInput.value = currentValue + " " + value;
-                                    }
-                                }
-
-                                  // Trigger the input event to update the search
-                                  const event = new Event('input', { bubbles: true });
-                                  searchInput.dispatchEvent(event);
-        }
-        function formatImplementationColumn(cell, formatterParams, onRendered) {
-          const usernames = (cell.getValue() || "").split(",").map(u => u.trim()).filter(Boolean);
-          return usernames.map(username =>
-            `<img src="https://github.com/${encodeURIComponent(username)}.png" width="24" height="24" style="vertical-align:middle;border-radius:2px;" alt="${username}"/>`
+        function formatArrayOrStringColumn(value, cssClass) {
+          const items = Array.isArray(value) ? value.filter(Boolean) :
+            (value || "").split(",").map(item => item.trim()).filter(Boolean);
+          return items.map(item =>
+            `<span class="${cssClass}" onclick="addToSearch('${item.replace(/'/g, "\\'")}')">${item}</span>`
           ).join(" ");
-        }
-
-      function formatArrayOrStringColumn(value, cssClass) {
-        let items = [];
-
-      if (Array.isArray(value)) {
-        items = value.filter(Boolean);
-      } else if (typeof value === 'string') {
-        items = value.split(",").map(item => item.trim()).filter(Boolean);
-      }
-
-      return items.map(item =>
-        `<span class="${cssClass}" onclick="addToSearch('${item.replace(/'/g, "\\'")}')" style="cursor: pointer;">${item}</span>`
-      ).join(" ");
     }
 
-      function formatTagsColumn(cell, formatterParams, onRendered) {
-        return formatArrayOrStringColumn(cell.getValue(), "badge");
-      }
-
-      function formatSkillsColumn(cell, formatterParams, onRendered) {
-        return formatArrayOrStringColumn(cell.getValue(), "badge-skills");
-      }
-
-      function formatSizeColumn(cell, formatterParams, onRendered) {
-        const value = (cell.getValue() || "").trim().toLowerCase();
-      if (!value) return "";
-      const badgeClass = `badge-size-${value}`;
-      return `<span class="badge ${badgeClass}" onclick="addToSearch('${value}')" style="cursor: pointer;">${value}</span>`;
-    }
-
-      function formatLinkColumn(cell, formatterParams, onRendered) {
+        function formatLinkColumn(cell, icon = "fa-external-link-alt", urlPrefix = "") {
         const value = cell.getValue();
         if (!value) return "";
-        const fullUrl = `https://thousandbrainsproject.readme.io/docs/${value}`;
-        return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" title="${fullUrl}">
-        <i class="fas fa-external-link-alt"></i>
-      </a>`;
-      }
-      function formatRfcLinkColumn(cell, formatterParams, onRendered) {
-        const value = cell.getValue();
-        if (!value) return "";
-        return `<a href="${value}" target="_blank" rel="noopener noreferrer" title="${value}">
-         <i class="fas fa-external-link-alt"></i>
-       </a>`;
+        const url = urlPrefix ? `${urlPrefix}${value}` : value;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" title="${url}"><i class="fas ${icon}"></i></a>`;
     }
 
-      function formatEditLinkColumn(cell, formatterParams, onRendered) {
+        const formatTagsColumn = (cell) => formatArrayOrStringColumn(cell.getValue(), "badge");
+        const formatSkillsColumn = (cell) => formatArrayOrStringColumn(cell.getValue(), "badge-skills");
+        const formatSizeColumn = (cell) => {
+          const value = (cell.getValue() || "").trim().toLowerCase();
+          return value ? `<span class="badge badge-size-${value}" onclick="addToSearch('${value}')">${value}</span>` : "";
+        };
+        const formatSlugLinkColumn = (cell) => formatLinkColumn(cell, "fa-external-link-alt", "https://thousandbrainsproject.readme.io/docs/");
+        const formatRfcLinkColumn = (cell) => formatLinkColumn(cell);
+        const formatEditLinkColumn = (cell) => formatLinkColumn(cell, "fa-pencil-alt", "https://github.com/thousandbrainsproject/tbp.monty/edit/main/");
+        const formatImplementationColumn = (cell) => {
         const value = cell.getValue();
-        if (!value) return "";
-        const editUrl = `https://github.com/thousandbrainsproject/tbp.monty/edit/main/${value}`;
-        return `<a href="${editUrl}" target="_blank" rel="noopener noreferrer" title="Edit ${value}">
-       <i class="fas fa-pencil-alt"></i>
-     </a>`;
-    }
+        return value ? (value.includes(',') ?
+          value.split(",").map(u => u.trim()).filter(Boolean).map(username =>
+            `<img src="https://github.com/${encodeURIComponent(username)}.png" width="24" height="24" style="vertical-align:middle;border-radius:2px;" alt="${username}"/>`
+          ).join(" ") : value) : "";
+      };
 
-
-
-      function formatImplementationColumn(cell, formatterParams, onRendered) {
-        const value = cell.getValue();
-        if (!value) return "";
-        return value;
-      }
-
-      let offline = true;
-      let url = 'https://raw.githubusercontent.com/codeallthethingz/delete-me/refs/heads/main/data.json';
-
-    if (offline) {
-      url = 'data.json';
-    }
-      fetch(url)
+        fetch('data.json')
         .then(res => res.json())
         .then(data => {
-          // Filter for future-work items only and exclude items without path2
-          const filteredData = data.filter(item => item.path1 === 'future-work' && item.path2);
-
         const table = new Tabulator("#table", {
-          data: filteredData,
+          data: data.filter(item => item.path1 === 'future-work' && item.path2),
           layout: 'fitDataStretch',
-          initialSort: [
-            { column: "path2", dir: "asc" },
-            { column: "title", dir: "asc" }
-          ],
+          initialSort: [{ column: "path2", dir: "asc" }, { column: "title", dir: "asc" }],
           columns: [
-            {
-              title: "",
-              field: "slug",
-              formatter: formatLinkColumn,
-              hozAlign: "center"
-            },
-            {
-              title: "",
-              field: "path",
-              formatter: formatEditLinkColumn,
-              hozAlign: "center"
-            },
-            {
-              title: "Title",
-              field: "title"
-            },
-            {
-              title: "Size",
-              field: "size",
-              formatter: formatSizeColumn
-            },
-            {
-              title: "RFC",
-              field: "rfc"
-            },
-            {
-              title: "RFC Link",
-              field: "rfc-link",
-              formatter: formatRfcLinkColumn
-            },
-            {
-              title: "Status",
-              field: "status"
-            },
-            {
-              title: "Implementation",
-              field: "implementation",
-              formatter: formatImplementationColumn
-            },
-            {
-              title: "Tags",
-              field: "tags",
-              formatter: formatTagsColumn,
-              widthGrow: 2
-            },
-            {
-              title: "Skills",
-              field: "skills",
-              formatter: formatSkillsColumn,
-              widthGrow: 2
-            }
+            { title: "", field: "slug", formatter: formatSlugLinkColumn, hozAlign: "center" },
+            { title: "", field: "path", formatter: formatEditLinkColumn, hozAlign: "center" },
+            { title: "Title", field: "title" },
+            { title: "Size", field: "size", formatter: formatSizeColumn },
+            { title: "RFC", field: "rfc" },
+            { title: "RFC Link", field: "rfc-link", formatter: formatRfcLinkColumn },
+            { title: "Status", field: "status" },
+            { title: "Implementation", field: "implementation", formatter: formatImplementationColumn },
+            { title: "Tags", field: "tags", formatter: formatTagsColumn, widthGrow: 2 },
+            { title: "Skills", field: "skills", formatter: formatSkillsColumn, widthGrow: 2 }
           ],
           groupBy: "path2"
         });
 
-        // Add global search functionality
-        const searchInput = document.getElementById("searchInput");
-        searchInput.addEventListener("input", function (e) {
-          const searchTerm = e.target.value.toLowerCase();
-          if (searchTerm.trim() === "") {
+          document.getElementById("searchInput").addEventListener("input", e => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            if (!searchTerm) {
             table.clearFilter();
           } else {
-            // Custom filter function to search across all fields
-            table.setFilter(function (data) {
-              const fieldsToSearch = [
-                data.title || "",
-                data.tags || "",
-                data.skills || "",
-                data.status || "",
-                data.implementation || "",
-                data.size || "",
-                data.link || "",
-                data.path2 || ""
-              ];
-
-              const allText = fieldsToSearch.join(" ").toLowerCase();
-              const searchWords = searchTerm.trim().split(/\s+/).filter(word => word.length > 0);
-              return searchWords.every(word => allText.includes(word));
+            table.setFilter(data => {
+              const allText = [data.title, data.tags, data.skills, data.status, data.implementation, data.size, data.link, data.path2]
+                .filter(Boolean).join(" ").toLowerCase();
+              return searchTerm.split(/\s+/).every(word => allText.includes(word));
             });
           }
         });
       })
-      .catch(err => console.error(err));
+        .catch(console.error);
   </script>
 </body>
 
