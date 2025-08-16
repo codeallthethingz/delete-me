@@ -81,100 +81,100 @@
 
   <script type="text/javascript" src="tabulator.min.js"></script>
   <script>
-        function formatImplementationColumn(cell, formatterParams, onRendered) {
-          const usernames = (cell.getValue() || "").split(",").map(u => u.trim()).filter(Boolean);
-          return usernames.map(username =>
-            `<img src="https://github.com/${encodeURIComponent(username)}.png" width="24" height="24" style="vertical-align:middle;border-radius:2px;" alt="${username}"/>`
-          ).join(" ");
-        }
-
-        function formatArrayOrStringColumn(value, cssClass) {
-          let items = [];
-
-        if (Array.isArray(value)) {
-          items = value.filter(Boolean);
-        } else if (typeof value === 'string') {
-          items = value.split(",").map(item => item.trim()).filter(Boolean);
-        }
-
-        return items.map(item =>
-          `<span class="${cssClass}">${item}</span>`
+      function formatImplementationColumn(cell, formatterParams, onRendered) {
+        const usernames = (cell.getValue() || "").split(",").map(u => u.trim()).filter(Boolean);
+        return usernames.map(username =>
+          `<img src="https://github.com/${encodeURIComponent(username)}.png" width="24" height="24" style="vertical-align:middle;border-radius:2px;" alt="${username}"/>`
         ).join(" ");
       }
 
-        function formatTagsColumn(cell, formatterParams, onRendered) {
-          return formatArrayOrStringColumn(cell.getValue(), "badge");
-        }
+      function formatArrayOrStringColumn(value, cssClass) {
+        let items = [];
 
-        function formatSkillsColumn(cell, formatterParams, onRendered) {
-          return formatArrayOrStringColumn(cell.getValue(), "badge-skills");
-        }
+      if (Array.isArray(value)) {
+        items = value.filter(Boolean);
+      } else if (typeof value === 'string') {
+        items = value.split(",").map(item => item.trim()).filter(Boolean);
+      }
 
-        function formatSizeColumn(cell, formatterParams, onRendered) {
-          const value = (cell.getValue() || "").trim().toLowerCase();
-          const label = value || "unknown";
-          const badgeClass = `badge-size-${label}`;
-          return `<span class="badge ${badgeClass}">${label}</span>`;
-        }
+      return items.map(item =>
+        `<span class="${cssClass}">${item}</span>`
+      ).join(" ");
+    }
 
-        function formatLinkColumn(cell, formatterParams, onRendered) {
-          const value = cell.getValue();
-          if (!value) return "";
-          const fullUrl = `https://thousandbrainsproject.readme.io/docs/${value}`;
-          return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" title="${fullUrl}">
+      function formatTagsColumn(cell, formatterParams, onRendered) {
+        return formatArrayOrStringColumn(cell.getValue(), "badge");
+      }
+
+      function formatSkillsColumn(cell, formatterParams, onRendered) {
+        return formatArrayOrStringColumn(cell.getValue(), "badge-skills");
+      }
+
+      function formatSizeColumn(cell, formatterParams, onRendered) {
+        const value = (cell.getValue() || "").trim().toLowerCase();
+        const label = value || "unknown";
+        const badgeClass = `badge-size-${label}`;
+        return `<span class="badge ${badgeClass}">${label}</span>`;
+      }
+
+      function formatLinkColumn(cell, formatterParams, onRendered) {
+        const value = cell.getValue();
+        if (!value) return "";
+        const fullUrl = `https://thousandbrainsproject.readme.io/docs/${value}`;
+        return `<a href="${fullUrl}" target="_blank" rel="noopener noreferrer" title="${fullUrl}">
         <i class="fas fa-external-link-alt"></i>
       </a>`;
-        }
-        function formatRfcLinkColumn(cell, formatterParams, onRendered) {
-          const value = cell.getValue();
-          if (!value) return "";
-          return `<a href="${value}" target="_blank" rel="noopener noreferrer" title="${value}">
+      }
+      function formatRfcLinkColumn(cell, formatterParams, onRendered) {
+        const value = cell.getValue();
+        if (!value) return "";
+        return `<a href="${value}" target="_blank" rel="noopener noreferrer" title="${value}">
          <i class="fas fa-external-link-alt"></i>
        </a>`;
-        }
+    }
 
-        function formatEditLinkColumn(cell, formatterParams, onRendered) {
-          const value = cell.getValue();
-          if (!value) return "";
-          const editUrl = `https://github.com/thousandbrainsproject/tbp.monty/edit/main/${value}`;
-          return `<a href="${editUrl}" target="_blank" rel="noopener noreferrer" title="Edit ${value}">
+      function formatEditLinkColumn(cell, formatterParams, onRendered) {
+        const value = cell.getValue();
+        if (!value) return "";
+        const editUrl = `https://github.com/thousandbrainsproject/tbp.monty/edit/main/${value}`;
+        return `<a href="${editUrl}" target="_blank" rel="noopener noreferrer" title="Edit ${value}">
        <i class="fas fa-pencil-alt"></i>
      </a>`;
-        }
+    }
 
 
 
-        function formatImplementationColumn(cell, formatterParams, onRendered) {
-          const value = cell.getValue();
-          if (!value) return "";
-          return value;
-        }
+      function formatImplementationColumn(cell, formatterParams, onRendered) {
+        const value = cell.getValue();
+        if (!value) return "";
+        return value;
+      }
 
-        let offline = true;
-        let url = 'https://raw.githubusercontent.com/codeallthethingz/delete-me/refs/heads/main/data.json';
+      let offline = true;
+      let url = 'https://raw.githubusercontent.com/codeallthethingz/delete-me/refs/heads/main/data.json';
 
     if (offline) {
       url = 'data.json';
     }
-        fetch(url)
-          .then(res => res.json())
-          .then(data => {
-            // Filter for future-work items only and exclude items without path2
-            const filteredData = data.filter(item => item.path1 === 'future-work' && item.path2);
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          // Filter for future-work items only and exclude items without path2
+          const filteredData = data.filter(item => item.path1 === 'future-work' && item.path2);
 
-          const table = new Tabulator("#table", {
-            data: filteredData,
-            layout: 'fitDataStretch',
-            initialSort: [
-              { column: "path2", dir: "asc" },
-              { column: "title", dir: "asc" }
-            ],
-            columns: [
-              {
-                title: "",
+        const table = new Tabulator("#table", {
+          data: filteredData,
+          layout: 'fitDataStretch',
+          initialSort: [
+            { column: "path2", dir: "asc" },
+            { column: "title", dir: "asc" }
+          ],
+          columns: [
+            {
+              title: "",
               field: "slug",
               formatter: formatLinkColumn,
-                hozAlign: "center"
+              hozAlign: "center"
             },
             {
               title: "",
@@ -225,34 +225,34 @@
           groupBy: "path2"
         });
 
-          // Add global search functionality
-          const searchInput = document.getElementById("searchInput");
-          searchInput.addEventListener("input", function (e) {
-            const searchTerm = e.target.value.toLowerCase();
-            if (searchTerm.trim() === "") {
-              table.clearFilter();
-            } else {
-              // Custom filter function to search across all fields
-              table.setFilter(function (data) {
-                const fieldsToSearch = [
-                  data.title || "",
-                  data.tags || "",
-                  data.skills || "",
-                  data.status || "",
-                  data.implementation || "",
-                  data.size || "",
-                  data.link || "",
-                  data.path2 || ""
-                ];
+        // Add global search functionality
+        const searchInput = document.getElementById("searchInput");
+        searchInput.addEventListener("input", function (e) {
+          const searchTerm = e.target.value.toLowerCase();
+          if (searchTerm.trim() === "") {
+            table.clearFilter();
+          } else {
+            // Custom filter function to search across all fields
+            table.setFilter(function (data) {
+              const fieldsToSearch = [
+                data.title || "",
+                data.tags || "",
+                data.skills || "",
+                data.status || "",
+                data.implementation || "",
+                data.size || "",
+                data.link || "",
+                data.path2 || ""
+              ];
 
-              // Join all field values and search within them
               const allText = fieldsToSearch.join(" ").toLowerCase();
-              return allText.includes(searchTerm);
+              const searchWords = searchTerm.trim().split(/\s+/).filter(word => word.length > 0);
+              return searchWords.every(word => allText.includes(word));
             });
           }
         });
-        })
-        .catch(err => console.error(err));
+      })
+      .catch(err => console.error(err));
   </script>
 </body>
 
