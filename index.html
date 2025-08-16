@@ -70,15 +70,7 @@
       background-color: #004d00;
     }
 
-    .badge-size-unknown {
-      background-color: #cccccc;
-      color: #222;
-      transition: background-color 0.2s ease;
-    }
 
-    .badge-size-unknown:hover {
-      background-color: #bbbbbb;
-    }
 
     #searchInput {
       width: 100%;
@@ -111,45 +103,45 @@
 
   <script type="text/javascript" src="tabulator.min.js"></script>
   <script>
-            // Function to add clicked badge value to search box
-            function addToSearch(value) {
-              const searchInput = document.getElementById("searchInput");
-              const currentValue = searchInput.value.trim();
+      // Function to add clicked badge value to search box
+      function addToSearch(value) {
+        const searchInput = document.getElementById("searchInput");
+        const currentValue = searchInput.value.trim();
 
-              // Add the new value to the search box, separated by space if there's already content
-              if (currentValue === "") {
-                searchInput.value = value;
-              } else {
-                searchInput.value = currentValue + " " + value;
-              }
-
-              // Trigger the input event to update the search
-              const event = new Event('input', { bubbles: true });
-              searchInput.dispatchEvent(event);
-
-              // Focus the search input
-              searchInput.focus();
-            }
-      function formatImplementationColumn(cell, formatterParams, onRendered) {
-        const usernames = (cell.getValue() || "").split(",").map(u => u.trim()).filter(Boolean);
-        return usernames.map(username =>
-          `<img src="https://github.com/${encodeURIComponent(username)}.png" width="24" height="24" style="vertical-align:middle;border-radius:2px;" alt="${username}"/>`
-        ).join(" ");
+      // Add the new value to the search box, separated by space if there's already content
+      if (currentValue === "") {
+        searchInput.value = value;
+      } else {
+        searchInput.value = currentValue + " " + value;
       }
 
-                function formatArrayOrStringColumn(value, cssClass) {
-                  let items = [];
+      // Trigger the input event to update the search
+      const event = new Event('input', { bubbles: true });
+      searchInput.dispatchEvent(event);
 
-                if (Array.isArray(value)) {
-                  items = value.filter(Boolean);
-                } else if (typeof value === 'string') {
-                  items = value.split(",").map(item => item.trim()).filter(Boolean);
-                }
+          // Focus the search input
+          searchInput.focus();
+        }
+        function formatImplementationColumn(cell, formatterParams, onRendered) {
+          const usernames = (cell.getValue() || "").split(",").map(u => u.trim()).filter(Boolean);
+          return usernames.map(username =>
+            `<img src="https://github.com/${encodeURIComponent(username)}.png" width="24" height="24" style="vertical-align:middle;border-radius:2px;" alt="${username}"/>`
+          ).join(" ");
+        }
 
-                return items.map(item =>
-                 `<span class="${cssClass}" onclick="addToSearch('${item.replace(/'/g, "\\'")}')" style="cursor: pointer;">${item}</span>`
-               ).join(" ");
-              }
+      function formatArrayOrStringColumn(value, cssClass) {
+        let items = [];
+
+      if (Array.isArray(value)) {
+        items = value.filter(Boolean);
+      } else if (typeof value === 'string') {
+        items = value.split(",").map(item => item.trim()).filter(Boolean);
+      }
+
+      return items.map(item =>
+        `<span class="${cssClass}" onclick="addToSearch('${item.replace(/'/g, "\\'")}')" style="cursor: pointer;">${item}</span>`
+      ).join(" ");
+    }
 
       function formatTagsColumn(cell, formatterParams, onRendered) {
         return formatArrayOrStringColumn(cell.getValue(), "badge");
@@ -159,12 +151,12 @@
         return formatArrayOrStringColumn(cell.getValue(), "badge-skills");
       }
 
-                function formatSizeColumn(cell, formatterParams, onRendered) {
-                  const value = (cell.getValue() || "").trim().toLowerCase();
-                  const label = value || "unknown";
-                  const badgeClass = `badge-size-${label}`;
-                return `<span class="badge ${badgeClass}" onclick="addToSearch('${label}')" style="cursor: pointer;">${label}</span>`;
-              }
+      function formatSizeColumn(cell, formatterParams, onRendered) {
+        const value = (cell.getValue() || "").trim().toLowerCase();
+      if (!value) return "";
+      const badgeClass = `badge-size-${value}`;
+      return `<span class="badge ${badgeClass}" onclick="addToSearch('${value}')" style="cursor: pointer;">${value}</span>`;
+    }
 
       function formatLinkColumn(cell, formatterParams, onRendered) {
         const value = cell.getValue();
