@@ -8,119 +8,71 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
 
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 20px;
+    body { font-family: sans-serif; margin: 20px; }
+    .search-container { margin-bottom: 20px; }
+    .badge, .badge-skills { 
+      padding: 4px 8px; border-radius: 4px; font-size: 12px; 
+      display: inline-block; cursor: pointer; transition: background-color 0.2s ease; 
     }
-
-    .badge {
-      background-color: #aaaaff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      display: inline-block;
-      transition: background-color 0.2s ease;
-    }
-
-    .badge:hover {
-      background-color: #9999ee;
-    }
-
-    .badge-skills {
-      background-color: #7984fd;
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      display: inline-block;
-      transition: background-color 0.2s ease;
-    }
-
-    .badge-skills:hover {
-      background-color: #6873ec;
-    }
-
-    .badge-size-small {
-      background-color: #b6fcb6;
-      color: #222;
-      transition: background-color 0.2s ease;
-    }
-
-    .badge-size-small:hover {
-      background-color: #a5eba5;
-    }
-
-    .badge-size-medium {
-      background-color: #4ec04e;
-      color: #fff;
-      transition: background-color 0.2s ease;
-    }
-
-    .badge-size-medium:hover {
-      background-color: #3da93d;
-    }
-
-    .badge-size-large {
-      background-color: #006400;
-      color: #fff;
-      transition: background-color 0.2s ease;
-    }
-
-    .badge-size-large:hover {
-      background-color: #004d00;
-    }
-
-
+    .badge { background-color: #aaaaff; }
+    .badge:hover { background-color: #9999ee; }
+    .badge-skills { background-color: #7984fd; color: #fff; }
+    .badge-skills:hover { background-color: #6873ec; }
+    .badge-size-small { background-color: #b6fcb6; color: #222; }
+    .badge-size-small:hover { background-color: #a5eba5; }
+    .badge-size-medium { background-color: #4ec04e; color: #fff; }
+    .badge-size-medium:hover { background-color: #3da93d; }
+    .badge-size-large { background-color: #006400; color: #fff; }
+    .badge-size-large:hover { background-color: #004d00; }
 
     #searchInput {
-      width: 100%;
-      padding: 3px 6px;
-      font-size: 16px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      box-sizing: border-box;
-      font-family: sans-serif;
+      width: 100%; padding: 3px 6px; font-size: 16px; border: 2px solid #ddd;
+      border-radius: 8px; box-sizing: border-box; font-family: sans-serif;
       transition: border-color 0.2s ease;
     }
-
-    #searchInput:focus {
-      outline: none;
-      border-color: #4ec04e;
-      box-shadow: 0 0 0 3px rgba(78, 192, 78, 0.1);
+    #searchInput:focus { 
+      outline: none; border-color: #4ec04e; 
+      box-shadow: 0 0 0 3px rgba(78, 192, 78, 0.1); 
     }
-
-    #searchInput::placeholder {
-      color: #999;
-    }
+    #searchInput::placeholder { color: #999; }
   </style>
 </head>
 
 <body>
-  <div style="margin-bottom: 20px;">
+  <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search across all fields...">
   </div>
   <div id="table"></div>
 
   <script type="text/javascript" src="tabulator.min.js"></script>
   <script>
-      // Function to add clicked badge value to search box
-      function addToSearch(value) {
-        const searchInput = document.getElementById("searchInput");
-        const currentValue = searchInput.value.trim();
+                                  // Function to toggle clicked badge value in search box
+                                  function addToSearch(value) {
+                                    const searchInput = document.getElementById("searchInput");
+                                    const currentValue = searchInput.value.trim();
 
-      // Add the new value to the search box, separated by space if there's already content
-      if (currentValue === "") {
-        searchInput.value = value;
-      } else {
-        searchInput.value = currentValue + " " + value;
-      }
+                                  // Split current search into words
+                                  const searchWords = currentValue === "" ? [] : currentValue.split(/\s+/);
 
-      // Trigger the input event to update the search
-      const event = new Event('input', { bubbles: true });
-      searchInput.dispatchEvent(event);
+                                  // Check if the value is already in the search
+                                  const existingIndex = searchWords.indexOf(value);
 
-          // Focus the search input
-          searchInput.focus();
+                                  if (existingIndex !== -1) {
+                                    // Remove the value if it already exists
+                                    searchWords.splice(existingIndex, 1);
+                                    searchInput.value = searchWords.join(" ");
+                                  } else {
+                                    // Add the value if it doesn't exist
+                                    if (currentValue === "") {
+                                      searchInput.value = value;
+                                    } else {
+                                      searchInput.value = currentValue + " " + value;
+                                    }
+                                }
+
+                                  // Trigger the input event to update the search
+                                  const event = new Event('input', { bubbles: true });
+                                  searchInput.dispatchEvent(event);
         }
         function formatImplementationColumn(cell, formatterParams, onRendered) {
           const usernames = (cell.getValue() || "").split(",").map(u => u.trim()).filter(Boolean);
