@@ -91,6 +91,11 @@
     #searchInput::placeholder {
       color: #999;
     }
+
+    .svg-inline--fa {
+      height: 0.7rem;
+      color: black;
+    }
   </style>
   </head>
 
@@ -136,6 +141,28 @@
         const formatSlugLinkColumn = (cell) => formatLinkColumn(cell, "fa-external-link-alt", "https://thousandbrainsproject.readme.io/docs/");
         const formatRfcLinkColumn = (cell) => formatLinkColumn(cell);
         const formatEditLinkColumn = (cell) => formatLinkColumn(cell, "fa-pencil-alt", "https://github.com/thousandbrainsproject/tbp.monty/edit/main/");
+          const formatTitleWithLinksColumn = (cell) => {
+            const rowData = cell.getRow().getData();
+            const title = cell.getValue() || "";
+            const slug = rowData.slug || "";
+            const path = rowData.path || "";
+
+            let result = title;
+
+            // Make title a link to docs if slug exists
+            if (slug) {
+              const docsUrl = `https://thousandbrainsproject.readme.io/docs/${slug}`;
+              result = `<a href="${docsUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">${title}</a>`;
+            }
+
+            // Add edit icon on the right if path exists
+            if (path) {
+              const editUrl = `https://github.com/thousandbrainsproject/tbp.monty/edit/main/${path}`;
+              result += ` <a href="${editUrl}" target="_blank" rel="noopener noreferrer" style="float: right; margin-left: 10px;" title="Edit on GitHub"><i class="fas fa-pencil-alt"></i></a>`;
+            }
+
+            return result;
+          };
         const formatImplementationColumn = (cell) => {
         const value = cell.getValue();
         return value ? (value.includes(',') ?
@@ -150,11 +177,9 @@
         const table = new Tabulator("#table", {
           data: data.filter(item => item.path1 === 'future-work' && item.path2),
           layout: 'fitDataStretch',
-          initialSort: [{ column: "path2", dir: "asc" }, { column: "title", dir: "asc" }],
+          initialSort: [{ column: "title", dir: "asc" }],
           columns: [
-            { title: "", field: "slug", formatter: formatSlugLinkColumn, hozAlign: "center" },
-            { title: "", field: "path", formatter: formatEditLinkColumn, hozAlign: "center" },
-            { title: "Title", field: "title" },
+            { title: "Title", field: "title", formatter: formatTitleWithLinksColumn },
             { title: "Size", field: "size", formatter: formatSizeColumn },
             { title: "RFC", field: "rfc" },
             { title: "RFC Link", field: "rfc-link", formatter: formatRfcLinkColumn },
